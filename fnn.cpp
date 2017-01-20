@@ -1,8 +1,9 @@
 /*
  *      Created on: 2005/2006
  *      Author: Rohitash Chandra 
-/* 
-	Some functions   are not currently used. You can use them depending on your requirements.
+
+
+        Simple FNN with Vanilla BP. Weight decay has been used. 
 
 */
  
@@ -21,6 +22,7 @@
 
 time_t TicTime;
 time_t TocTime;
+
 
 
 using namespace::std;
@@ -223,13 +225,13 @@ class NeuralNetwork{
 			Heuristic = H;
         	}
 		
+	        //Some functions   are not currently used. You can use them depending on your requirements.
 		double Random();
 		
 		double Sigmoid(double ForwardOutput);
 		
-		double NMSError() {return NMSE;} 
-		
-		Layer BPchrome(){return ChromeNeuron;} 
+		double NMSError() {return NMSE;} // not used - good for time series problems
+		 
 		
 		void CreateNetwork(Sizes Layersize ,TrainingExamples TraineeSamples);
 		
@@ -241,15 +243,13 @@ class NeuralNetwork{
 		
 		bool ErrorTolerance(TrainingExamples TraineeSamples,Sizes Layersize, double TrainStopPercent);
 		
-		bool ErrorToleranceHalf(TrainingExamples TraineeSamples,Sizes Layersize, double TrainStopPercent);
-		
+	 	
 		double SumSquaredError(TrainingExamples TraineeSamples,Sizes Layersize);
 		
 		int BackPropogation(  TrainingExamples TraineeSamples, double LearningRate,Sizes Layersize,char* Savefile,bool load);
 		
 		void SaveLearnedData(Sizes Layersize,char* filename) ;
-
-		double Rate(TrainingExamples TraineeSamples,Sizes Layersize);
+ 
 
 		void LoadSavedData(Sizes Layersize,char* filename) ;
 
@@ -260,9 +260,7 @@ class NeuralNetwork{
         	double  TestTrainingData(Sizes Layersize, char* filename,int  size, char* load,  int inputsize, int outputsize , ofstream & out2 );
 
 		double CountTestingData(TrainingExamples TraineeSamples,int temp,Sizes Layersize);
-
-		double LearningRate(TrainingExamples TraineeSamples,Sizes Layersize, int pattern);
-
+ 
 		bool CheckOutput(TrainingExamples TraineeSamples,int pattern,Sizes Layersize);
 };
 	
@@ -507,38 +505,7 @@ bool NeuralNetwork::ErrorTolerance(TrainingExamples TraineeSamples,Sizes Layersi
 	
 }
 
-
-bool NeuralNetwork::ErrorToleranceHalf(TrainingExamples TraineeSamples,Sizes Layersize, double TrainStopPercent)
-{
-    //declare essential variables
-	double count = 0;
-    int total = TraineeSamples.Datapoints;
-    double accepted = total;
-    double Error;
-    int end = Layersize.size() - 1;
-
-	for(int pattern = 0; pattern< TraineeSamples.Datapoints; pattern++){
-		for(int output = 0; output < Layersize[end]; output++) {
-			Error = TraineeSamples.OutputValues[pattern][output] - Output[pattern][output];//difference between actual and desired output
-			if(Error < 0)
-				Error = Error * -1;//absolute value of error
-
-			if( Error <= 0.499)
-				count ++;//increase error count
-		}//for
-    }//for
-
-    double TrainPercent = 0;
-
-    TrainPercent=  (count/ accepted)* 100;//get percentage of correctly classified instances
-
-    if(TrainPercent >=TrainStopPercent)//if required level of training is reached then stop
-		return false;
-
-    cout<<count<<"  is half the count out of "<<accepted <<" ::"<<TrainPercent<<"  percent"<<endl;
-    return true;
-}
-
+ 
 double NeuralNetwork::SumSquaredError(TrainingExamples TraineeSamples,Sizes Layersize)
 {   int end = Layersize.size() - 1;//know last layer
     double Sum = 0;
@@ -556,33 +523,7 @@ double NeuralNetwork::SumSquaredError(TrainingExamples TraineeSamples,Sizes Laye
 	}
 	return sqrt(Sum/TraineeSamples.Datapoints*Layersize[end]);//return square root of sum / (no. of training samples * no. of neurons in output layer)
 }
-
-double NeuralNetwork::Rate(TrainingExamples TraineeSamples,Sizes Layersize)
-{   
-	//variable declaration
-	int end = Layersize.size() - 1;
-    double Sum = 0;
-    double Error=0;
-    double ErrorSquared=0;
-    double rate = 0;
-	
-    for(int pattern = 0; pattern< TraineeSamples.Datapoints ; pattern++){
-		for(int output = 0; output < Layersize[end]; output++) {
-			Error = TraineeSamples.OutputValues[pattern][output] - Output[pattern][output];
-			ErrorSquared += (Error * Error);//square the error
-		}
-		Sum += (ErrorSquared);//add to cumulative error
-		ErrorSquared=0;//reset to 0 for next training sample
-    }
-
-	rate =  Sum / (TraineeSamples.Datapoints *(Layersize[end]));
-	return rate;
-}
-/*
-	--PrintWeights--
-
-	Output the weights, bias factor, error term and neuron values
-*/
+ 
 void NeuralNetwork::PrintWeights(Sizes Layersize)//output the values of all the connection weights
 {
     int end = Layersize.size() - 1;
